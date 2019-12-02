@@ -1,0 +1,3 @@
+1) put a copy of pshs-logo.png on download folder, or put the full address of the logo.
+2) install https://chrome.google.com/webstore/detail/downloads-overwrite-alrea/lddjgfpjnifpeondafidennlcfagekbp for overwriting purposes
+3) disable popup for multiple downloads on chrome

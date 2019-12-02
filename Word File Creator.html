@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="jquery-3.4.1.min.js"></script>
+	<script src="Chart.min.js"></script>
+    <script src="canvas-toBlob.js"></script>
+	<style>
+		#wrapper {
+			max-width: 450px;
+			margin: 50px auto;
+		}
+		#download_button{
+			border: 1px solid gold;
+			text-decoration:none;
+			color: cornflowerblue;
+			border-radius: 30px 20px;
+			padding: 10px;
+		}
+
+	</style>
+	
+</head>
+
+<body>
+	<div id="wrapper" >	
+		<canvas id="myChart"> </canvas><br>
+	</div>
+	<script>
+//Parameters: (x-axis,y-axis,title,diseaseName,datesOfRecord,comment)
+	// Our labels along the x-axis
+		var y_axis = ["January","February","March","April","May","June","July","August","September","October"];
+		var x_axis = [86,114,106,106,107,111,133,221,783,2478];
+		var title = "Recorded Monthly Incidence of Infectious Diseases for Academic Year 2018-2019";
+		var diseaseName = "URTI";
+		var datesOfRecord = 'August 14, 2018-April 24, 2019';
+		var comment = 'Laughter is the best medicine in life, and browsing for memes is guaranteed to brighten your day by putting a big beautiful smile on your face.  No need to go to the doctor, you will die anyway.'
+		
+		//
+		var ctx = document.getElementById("myChart");
+		
+		
+
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			options: {
+				animation: {
+					onComplete: function(){
+						var url_base64jp = document.getElementById("myChart").toDataURL("image/jpg");
+						console.log(url_base64jp);//test
+						//doc file code made with brute force, extracting ms word, and divine intervention
+						var htmlString = 
+						'<html xmlns:"http://www.w3.org/TR/REC-html40" xmlns:office="urn:schemas-microsoft-com:office:office" xmlns:word="urn:schemas-microsoft-com:office:word"> <head><xml><word:WordDocument><word:View>Print</word:View><word:Zoom>90</word:Zoom><word:DoNotOptimizeForBrowser/></word:WordDocument></xml></head>'+
+						'<body style="font-family:times new roman; font-size:12pt;">'+
+						'<div id="header" style="width:627px; text-align:left;"><img src="pshs-logo.png" width="627" height="89"/></div><br><br><br>'+
+						'<div id="title" style="text-align:center; font-size:16pt; font-weight:bold;">'+title+'</div><br>'+
+						'<div id="datesOfRecord" style="text-align:center; font-style:italic;">(Records as of '+datesOfRecord+')</div><br><br>'+
+						'<div id="diseaseName">'+diseaseName+'</div><br><br>'+
+						'<div id="graph" style="text-align:center;"><img src="'+diseaseName+'.jpg"/></div><br><br><br>'+
+						'<div id="comment" style="text-align: justify; text-justify: inter-word;">'+comment+'</div>'+
+						'</body>'+
+						'</html>';
+						
+						var dataUri = 'data:text/html,'+ encodeURIComponent(htmlString);
+						console.log(dataUri);
+						//javascript code for multiple file download
+						function downloadAll(files){
+							if(files.length == 0) return;
+							file = files.pop();
+							var theAnchor = $('<a />')
+								.attr('href', file[1])
+								.attr('download',file[0])
+								.appendTo('body');
+							
+							theAnchor[0].click(); 
+							theAnchor.remove();
+							downloadAll(files);
+						}
+						
+						//dowload start
+						downloadAll([
+							[diseaseName+'.jpg', url_base64jp],
+							[diseaseName+'.doc', dataUri]
+						]);
+						console.log("Download Complete");//test
+					}
+				}
+			},
+			responsive: true,
+			maintainAspectRatio: false,
+			data: {
+				labels: y_axis,
+				datasets: [
+					{ 
+						data: x_axis,
+						label: diseaseName,
+						backgroundColor: "rgba(100,20,140,0.6)",
+						borderColor: "rgba(200,20,140,0.6)",
+						fill: false
+					}
+				]
+			}
+		});
+	function createDocx(x,y,t,dn,dor,c){
+		var y_axis = y;
+		var x_axis = x;
+		//content of report
+		var title = t;
+		var diseaseName = dn;
+		var datesOfRecord = dor;
+		var comment = c
+		//
+		var ctx = document.getElementById("myChart");
+		
+		
+
+		var myChart = new Chart(ctx, {
+			type: 'bar',
+			options: {
+				animation: {
+					onComplete: function(){
+						var url_base64jp = document.getElementById("myChart").toDataURL("image/jpg");
+						console.log(url_base64jp);//test
+						//doc file code made with brute force, extracting ms word, and divine intervention
+						var htmlString = 
+						'<html xmlns:"http://www.w3.org/TR/REC-html40" xmlns:office="urn:schemas-microsoft-com:office:office" xmlns:word="urn:schemas-microsoft-com:office:word"> <head><xml><word:WordDocument><word:View>Print</word:View><word:Zoom>90</word:Zoom><word:DoNotOptimizeForBrowser/></word:WordDocument></xml></head>'+
+						'<body style="font-family:times new roman; font-size:12pt;">'+
+						'<div id="header" style="width:627px; text-align:left;"><img src="pshs-logo.png" width="627" height="89"/></div><br><br><br>'+
+						'<div id="title" style="text-align:center; font-size:16pt; font-weight:bold;">'+title+'</div><br>'+
+						'<div id="datesOfRecord" style="text-align:center; font-style:italic;">(Records as of '+datesOfRecord+')</div><br><br>'+
+						'<div id="diseaseName">'+diseaseName+'</div><br><br>'+
+						'<div id="graph" style="text-align:center;"><img src="'+diseaseName+'.jpg"/></div><br><br><br>'+
+						'<div id="comment" style="text-align: justify; text-justify: inter-word;">'+comment+'</div>'+
+						'</body>'+
+						'</html>';
+						
+						var dataUri = 'data:text/html,'+ encodeURIComponent(htmlString);
+						console.log(dataUri);
+						//javascript code for multiple file download
+						function downloadAll(files){
+							if(files.length == 0) return;
+							file = files.pop();
+							var theAnchor = $('<a />')
+								.attr('href', file[1])
+								.attr('download',file[0])
+								.appendTo('body');
+							
+							theAnchor[0].click(); 
+							theAnchor.remove();
+							downloadAll(files);
+						}
+						
+						//dowload start
+						downloadAll([
+							[diseaseName+'.jpg', url_base64jp],
+							[diseaseName+'.doc', dataUri]
+						]);
+						console.log("Download Complete");//test
+					}
+				}
+			},
+			responsive: true,
+			maintainAspectRatio: false,
+			data: {
+				labels: y_axis,
+				datasets: [
+					{ 
+						data: x_axis,
+						label: "Random Stuff for Clinic DB",
+						backgroundColor: "rgba(100,20,140,0.6)",
+						fill: false
+					}
+				]
+			}
+		});
+	}
+		
+	</script>
+</body>
+</html>
