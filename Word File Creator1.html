@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="jquery-3.4.1.min.js"></script>
+	<script src="Chart.min.js"></script>
+    <script src="canvas-toBlob.js"></script>
+	<script src="canvasjs.min.js"></script>
+	<style>
+		#wrapper {
+			max-width: 450px;
+			margin: 50px auto;
+		}
+		#download_button{
+			border: 1px solid gold;
+			text-decoration:none;
+			color: cornflowerblue;
+			border-radius: 30px 20px;
+			padding: 10px;
+		}
+
+	</style>
+	
+</head>
+
+<body>
+	
+	<script>
+//Parameters: (x_axis,y_axis,title,diseaseName,datesOfRecord,comment)
+	//	var y_axis = ["January","February","March","April","May","June","July","August","September","October"];
+	//	var x_axis = [86,114,106,106,107,111,133,221,783,2478];
+	//	var title = "Recorded Monthly Incidence of Infectious Diseases for Academic Year 2018-2019";
+	//	var diseaseName = "URTI";
+	//	var datesOfRecord = 'August 14, 2018-April 24, 2019';
+	//	var comment = 'Laughter is the best medicine in life, and browsing for memes is guaranteed to brighten your day by putting a big beautiful smile on your face.  No need to go to the doctor, you will die anyway.';
+	
+	//javascript code for multiple file download
+	function downloadAll(files){
+		if(files.length == 0) return;
+		file = files.pop();
+		var theAnchor = $('<a />')
+			.attr('href', file[1])
+			.attr('download',file[0])
+			.appendTo('body');
+		
+		theAnchor[0].click(); 
+		theAnchor.remove();
+		downloadAll(files);
+	}
+	function populate(y_axis,x_axis){//for data population on the data points. will probably use the y_axis and x_axis; although x_axis here will just be an array, not an array within array
+		var arr=[];
+		for(i=0;i<x_axis.length;i++){
+			arr.push({label:x_axis[i],y:y_axis[i]});
+		}
+		return arr;
+	}
+	function createFile(y_axis,x_axis,title,diseaseName,datesOfRecord,comment){//y_axis is an array within array; x_axis, diseaseName and comment are arrays; y_axis, diseaseName and comment are equal in length.
+		var htmlString = '<html xmlns:"http://www.w3.org/TR/REC-html40" xmlns:office="urn:schemas-microsoft-com:office:office" xmlns:word="urn:schemas-microsoft-com:office:word"><head><xml><word:WordDocument><word:View>Print</word:View><word:Zoom>90</word:Zoom><word:DoNotOptimizeForBrowser/></word:WordDocument></xml></head><body style="font-family:times new roman; font-size:12pt;">';
+		var downloadArray = new Array();
+		var wrapper = document.createElement('div');
+		wrapper.id='wrapper';
+		wrapper.style.width="450px";
+		wrapper.style.height="250px";
+		document.body.appendChild(wrapper);
+		wrapper.style.visibility="hidden";//make the element invisible
+		for(let j=0;j<diseaseName.length;j++){
+			var datapoints=populate(y_axis[j],x_axis);
+			var chart = new CanvasJS.Chart("wrapper", {
+			animationEnabled: false,
+			theme: "light2", // "light1", "light2", "dark1", "dark2"
+			title:{
+				text: diseaseName[j],
+				fontSize: 14
+			},
+			axisY: {
+				title: "Number of Cases"
+			},
+			data: [{        
+				type: "column",  
+				dataPoints: datapoints
+			}]
+			});
+			chart.render();
+			var canvas = $("#wrapper .canvasjs-chart-canvas").get(0);
+			var url_base64jp = canvas.toDataURL("image/jpg");
+			//console.log(url_base64jp);//test
+			//append to overall html file
+			htmlString = htmlString.concat('<div id="header" style="width:627px; text-align:left;"><img src="pshs-logo.png" width="627" height="89"/></div><br><br><br>','<div id="title" style="text-align:center; font-size:16pt; font-weight:bold;">',title,'</div><br>','<div id="datesOfRecord" style="text-align:center; font-style:italic;">(Records as of ',datesOfRecord,')</div><br><br>','<div id="diseaseName">',diseaseName[j],'</div><br><br>','<div id="graph" style="text-align:center;"><img src="',diseaseName[j],'.jpg"/></div><br><br>','<div id="comment" style="text-align: justify; text-justify: inter-word;">',comment[j]);
+			//push to overall array
+			downloadArray.push([diseaseName[j]+'.jpg', url_base64jp]);
+			if(j<diseaseName.length-1){
+				htmlString = htmlString.concat('</div><br clear=all style="mso-special-character:line-break;page-break-before:always">');
+			}else{
+				
+				htmlString= htmlString.concat('</body></html>');
+				var dataUri = 'data:text/html,'+ encodeURIComponent(htmlString);
+				downloadArray.push([title+'.doc', dataUri]);
+				downloadAll(downloadArray);
+			}
+		}
+		
+	}
+	
+	createFile([[86,114,106,106,107,111,133,221,783,2478],[86,114,106,106,10,111,1313,221,7483,278]],["January","February","March","April","May","June","July","August","September","October"],"Recorded Monthly Incidence of Infectious Diseases for Academic Year 2018-2019",["URTI","dsda"],'August 14, 2018-April 24, 2019',['Laughter is the best medicine in life, and browsing for memes is guaranteed to brighten your day by putting a big beautiful smile on your face.  No need to go to the doctor, you will die anyway.','dsadmasjd']);
+	</script>
+</body>
+</html>
